@@ -1,9 +1,16 @@
 .input-box-style {
-
   .label {
     color: black;
   }
   .input {
-    border-radius: 3px;
+    border-top: 0px;
+    border-left: 0px;
+    border-right: 0px;
+    background-color: #ffffff;
+    border-bottom-color: #f2dff5;
+    &:hover{
+      border-bottom-color: #a02fb4;
+    }
+    
   }
 }

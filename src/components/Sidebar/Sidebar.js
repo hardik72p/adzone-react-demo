@@ -22,7 +22,7 @@ const useStyles = makeStyles(styles);
 export default function Sidebar(props) {
   const classes = useStyles();
   // verifies if routeName is the one active (in browser input)
-  function activeRoute(routeName) {
+  function activeRoute(routeName) { 
     return window.location.href.indexOf(routeName) > -1 ? true : false;
   }
   const { color, logo, image, logoText, routes } = props;
@@ -75,6 +75,7 @@ export default function Sidebar(props) {
                 disableTypography={true}
               />
             </ListItem>
+
           </NavLink>
         );
       })}

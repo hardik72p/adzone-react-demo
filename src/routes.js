@@ -37,50 +37,59 @@ import UserForm from "views/UserProfile/UserForm.js";
 import AddProduct from "views/UserProfile/AddProduct.js";
 // core components/views for RTL layout
 import RTLPage from "views/RTLPage/RTLPage.js";
+import { isParameter } from "typescript";
 
 
 const dashboardRoutes = [
+  // {
+  //   path: "/profile",
+  //   name: "Dashboard",
+  //   rtlName: "لوحة القيادة",
+  //   // icon: Profile,
+  //   component: AddProduct,
+  //   layout: "/publicity"
+  // },
   {
     path: "/dashboard",
     name: "Dashboard",
     rtlName: "لوحة القيادة",
     icon: Dashboard,
     component: DashboardPage,
-    layout: "/admin"
+    layout: "/publicity"
   },
   {
-    path: "/user",
-    name: "User Profile",
+    path: "/addproduct",
+    name: "Add Product",
     rtlName: "ملف تعريفي للمستخدم",
-    icon: Person,
+    icon: "add_to_photos",
     // component: UserProfile,
     component: AddProduct,
     // component: UserForm,
-    layout: "/admin"
+    layout: "/publicity"
   },
   {
-    path: "/table",
-    name: "Table List",
+    path: "/viewproduct",
+    name: "View Product",
     rtlName: "قائمة الجدول",
     icon: "content_paste",
     component: TableList,
-    layout: "/admin"
+    layout: "/publicity"
   },
   {
-    path: "/typography",
-    name: "Typography",
+    path: "/report",
+    name: "Report",
     rtlName: "طباعة",
     icon: LibraryBooks,
     component: Typography,
-    layout: "/admin"
+    layout: "/publicity"
   },
   {
-    path: "/icons",
-    name: "Icons",
+    path: "/viewfeedback",
+    name: "View Feedback",
     rtlName: "الرموز",
     icon: BubbleChart,
     component: Icons,
-    layout: "/admin"
+    layout: "/publicity"
   },
   {
     path: "/maps",
@@ -88,32 +97,32 @@ const dashboardRoutes = [
     rtlName: "خرائط",
     icon: LocationOn,
     component: Maps,
-    layout: "/admin"
+    layout: "/publicity"
   },
   {
-    path: "/notifications",
-    name: "Notifications",
+    path: "/addoffers",
+    name: "Add Offers",
     rtlName: "إخطارات",
     icon: Notifications,
     component: NotificationsPage,
-    layout: "/admin"
+    layout: "/publicity"
   },
-  {
-    path: "/rtl-page",
-    name: "RTL Support",
-    rtlName: "پشتیبانی از راست به چپ",
-    icon: Language,
-    component: RTLPage,
-    layout: "/rtl"
-  },
-  {
-    path: "/upgrade-to-pro",
-    name: "Upgrade To PRO",
-    rtlName: "التطور للاحترافية",
-    icon: Unarchive,
-    component: UpgradeToPro,
-    layout: "/admin"
-  }
+  // {
+  //   path: "/rtl-page",
+  //   name: "RTL Support",
+  //   rtlName: "پشتیبانی از راست به چپ",
+  //   icon: Language,
+  //   component: RTLPage,
+  //   layout: "/rtl"
+  // },
+  // {
+  //   path: "/upgrade-to-pro",
+  //   name: "Upgrade To PRO",
+  //   rtlName: "التطور للاحترافية",
+  //   icon: Unarchive,
+  //   component: UpgradeToPro,
+  //   layout: "/admin"
+  // }
 ];
 
 export default dashboardRoutes;

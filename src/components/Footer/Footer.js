@@ -47,9 +47,9 @@ export default function Footer(props) {
               target="_blank"
               className={classes.a}
             >
-              Creative Tim
+              AdZone
             </a>
-            , made with love for a better web
+            , digital web any where 
           </span>
         </p>
       </div>

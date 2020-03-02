@@ -39,13 +39,13 @@ export default function Header(props) {
       <Toolbar className={classes.container}>
         <div className={classes.flex}>
           {/* Here we create navbar brand, based on route name */}
-          <Button color="transparent" href="#" className={classes.title}>
+           <Button color="transparent" href="#" className={classes.title}>
             {makeBrand()}
           </Button>
         </div>
         {/* ---------------------------start   :nav-bar for web view----------------------------  */}
         <Hidden smDown implementation="css">
-          {props.rtlActive ? <RTLNavbarLinks /> : <AdminNavbarLinks />}
+          {props.rtlActive ? <RTLNavbarLinks /> : <AdminNavbarLinks {...props} />}
         </Hidden>
         {/* ----------------------------end    :nav-bar for web view----------------------------  */}
 

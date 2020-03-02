@@ -7,11 +7,14 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
+import 'scss/my-scss.scss';
+import server from 'utilities.js';
+import axios from 'axios';
 import { InputBox, CheckBox, MyRadio, DropDown } from './InputBox';
 
 class UserForm extends Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.state = {
 			formData: {
 				companyName: '',
@@ -80,6 +83,8 @@ class UserForm extends Component {
 		this.setState({ formData: formDataObj, formError: { ...formError, [name]: '' } });
 	}
 
+
+
 	getRegEx = (name) => {
 		switch (name) {
 			case 'companyName':
@@ -125,29 +130,38 @@ class UserForm extends Component {
 	}
 
 	submitHandler = (e) => {
-    const { formData, formError } = this.state
-    let errorMessage = '';
+		const { ip, port } = this.props
+		const { formData, formError } = this.state
+		let errorMessage = '';
 		let errorObj = formError;
-		
+		Object.keys(formData).map((value) => {
+			if (!formData[value] || formData[value].length == 0) {
+				errorMessage = `invalid ${value}`;
+				errorObj[value] = errorMessage;
+			}
+		})
+		this.setState({ formError: errorObj });
 
+		if (errorMessage === '') {
+			const formDataProduct = new FormData();
+			const config = {
+				headers: {
+					'content-type': 'multipart/form-data'
+				}
+			}
+			console.log(this.state);
+			formDataProduct.append('image', this.state.selectedFile);
+			for (let name in this.state.formData) {
+				console.log(name, this.state.formData[name])
+				formDataProduct.set(name, this.state.formData[name]);
+			}
+			console.log(formDataProduct);
+			axios.post(`http://${server.ip}:${server.port}/product/addProduct`, formDataProduct, config)
+				.then(res => alert("File uploaded successfully."))
+				.catch((err) => console.log(err));
+		}
+	}
 
-
-		
-    Object.keys(formData).map((value) => {
-      if (!formData[value] || formData[value].length == 0) {
-        errorMessage = `invalid ${value}`;
-        errorObj[value] = errorMessage;
-      }
-    })
-    this.setState({ formError: errorObj },()=>{
-      if(formData[value].length == 0){
-        const AddProductObj = this.state.formData;
-        axios.post('http://192.168.2.65:3030/posts', )
-          .then(res => console.log(res.data))
-          .then((e) => this.updateListHandler()); 
-      }
-    });
-  }
 
 	render() {
 		const { formError, formData } = this.state
@@ -157,12 +171,13 @@ class UserForm extends Component {
 					<Card>
 						<CardHeader color="primary">
 
-							<h4 className>Add Product</h4>
+							<h4 className>Edit Profile</h4>
 							<p className>Complete your product details</p>
 							{/* <h4 className={classes.cardTitleWhite}>Add Product</h4>
 							<p className={classes.cardCategoryWhite}>Complete your product details</p> */}
 						</CardHeader>
 						<CardBody>
+							<br />
 							<GridContainer>
 								<GridItem xs={12} sm={12} md={3}>
 									<InputBox
@@ -237,9 +252,9 @@ class UserForm extends Component {
 										type='text'
 										name='webSite'
 										placeHolder='https://developer.mozilla.org/en-US/'
-										value={formData.userName}
+										value={formData.webSite}
 										isReq={true}
-										errorMessage={formError.userName}
+										errorMessage={formError.webSite}
 										onChange={this.dataHandler}
 										onBlur={this.validationHandler}
 									/>
@@ -320,9 +335,9 @@ class UserForm extends Component {
 										type='textarea'
 										name='address'
 										placeHolder=''
-										value={formData.userName}
+										value={formData.address}
 										isReq={true}
-										errorMessage={formError.userName}
+										errorMessage={formError.address}
 										onChange={this.dataHandler}
 										onBlur={this.validationHandler}
 									/>

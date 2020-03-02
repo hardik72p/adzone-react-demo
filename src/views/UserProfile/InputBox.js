@@ -18,7 +18,6 @@ export const InputBox = (props) => {
 				className="input"
 				title={props.label}
 				placeholder={props.placeHolder}
-				className={props.className}
 				type={props.type}
 				name={props.name}
 				data-attribute={props.isReq}

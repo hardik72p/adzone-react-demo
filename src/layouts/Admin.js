@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route, Redirect } from "react-router-dom";
+import { Switch, Route, Redirect, Link } from "react-router-dom";
 // creates a beautiful scrollbar
 import PerfectScrollbar from "perfect-scrollbar";
 import "perfect-scrollbar/css/perfect-scrollbar.css";
@@ -17,26 +17,35 @@ import styles from "assets/jss/material-dashboard-react/layouts/adminStyle.js";
 
 import bgImage from "assets/img/sidebar-2.jpg";
 import logo from "assets/img/reactlogo.png";
+import AddProduct from "views/UserProfile/AddProduct";
+import EditProfile from 'components/EditProfile';
+import UserForm from "views/UserProfile/UserForm";
+import { isPropertySignature } from "typescript";
 
 let ps;
 
 const switchRoutes = (
   <Switch>
+    {/* <Route exact path="/publicity/profile/setting" component={Setting}/> */}
+    <Route exact path="/publicity/profile/edit" component={UserForm} />
     {routes.map((prop, key) => {
-      if (prop.layout === "/admin") {
+      if (prop.layout === "/publicity") {
         return (
           <Route
-            path={prop.layout + prop.path}
+            path={"/publicity" + prop.path}
             component={prop.component}
             key={key}
+            ip={prop.ip}
+            port={prop.port}
           />
         );
       }
-      return null;
+
     })}
-    <Redirect from="/admin" to="/admin/dashboard" />
+    <Redirect from="/publicity" to="/publicity/dashboard" />
   </Switch>
 );
+
 
 const useStyles = makeStyles(styles);
 
@@ -46,6 +55,8 @@ export default function Admin({ ...rest }) {
   // ref to help us initialize PerfectScrollbar on windows devices
   const mainPanel = React.createRef();
   // states and functions
+  const [ip, setIp] = React.useState('0');
+  const [port, setPort] = React.useState("6");
   const [image, setImage] = React.useState(bgImage);
   const [color, setColor] = React.useState("blue");
   const [fixedClasses, setFixedClasses] = React.useState("dropdown show");
@@ -111,14 +122,13 @@ export default function Admin({ ...rest }) {
           {...rest}
         />
         {/* On the /maps route we want the map to be on full screen - this is not possible if the content and conatiner classes are present because they have some paddings which would make the map smaller */}
-        {
-          getRoute()
-            ?
-            <div className={classes.content}>
-              <div className={classes.container}>{switchRoutes}</div>
-            </div>
-            :
+        {getRoute() ? (
+          <div className={classes.content}>
+            <div className={classes.container}>{switchRoutes}</div>
+          </div>
+        ) : (
             <div className={classes.map}>{switchRoutes}</div>
+          )
         }
         {getRoute() ? <Footer /> : null}
         <FixedPlugin

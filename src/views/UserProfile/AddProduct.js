@@ -7,18 +7,24 @@ import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import CardFooter from "components/Card/CardFooter.js";
 
+
 import { InputBox, CheckBox, MyRadio, DropDown } from './InputBox';
+import { Label, FormGroup, Input, Form } from 'reactstrap';
+import server from 'utilities.js';
+import 'scss/my-scss.scss';
+import axios from 'axios';
 
 class AddProduct extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       formData: {
         sku: '',
         category: '',
         mediaType: '',
         lightingType: '',
-        size: '',
+        sizex: 0,
+        sizey: 0,
         unit: '',
         lat: '',
         lng: '',
@@ -27,10 +33,10 @@ class AddProduct extends Component {
         landmark: '',
         city: '',
         state: '',
-        ratePerMonth: '',
-        ratePerDay: '',
-        tier: '',
-        initialCost: ''
+        ratePerMonth: 0,
+        ratePerDay: 0,
+        tier: 0,
+        initialCost: 0
       },
       formError: {
         sku: null,
@@ -90,6 +96,12 @@ class AddProduct extends Component {
       { value: "jamnagar", label: "Jamnagar" }
     ];
   }
+  onFileChangeHandler = (e) => {
+    e.preventDefault();
+    this.setState({
+      selectedFile: e.target.files[0]
+    });
+  };
 
   dataHandler = (e) => {
     const { formData, formError } = this.state;
@@ -133,7 +145,6 @@ class AddProduct extends Component {
     const { name, value, title, attributes } = e.target;
     let errorMessage = '';
     let formDataColne = formData;
-    // console.log("access coustom attribute", !e.target.attributes.getNamedItem("data-attribute").value, "set by InputBox #data-*att_name*");
 
     if (name === 'hobbies') {
       if (formData.hobbies.length === 0)
@@ -152,6 +163,7 @@ class AddProduct extends Component {
   }
 
   submitHandler = (e) => {
+    const { ip, port } = this.props;
     const { formData, formError } = this.state
     let errorMessage = '';
     let errorObj = formError;
@@ -161,293 +173,318 @@ class AddProduct extends Component {
         errorObj[value] = errorMessage;
       }
     })
-    this.setState({ formError: errorObj },()=>{
-      if(formData[value].length == 0){
-        const AddProductObj = this.state.formData;
-        axios.post('http://192.168.2.65:3030/posts',AddProductObj )
-          .then(res => console.log(res.data))
-          .then((e) => this.updateListHandler()); 
+    this.setState({ formError: errorObj });
+
+    if (errorMessage === '') {
+      const formDataProduct = new FormData();
+      const config = {
+        headers: {
+          'content-type': 'multipart/form-data'
+        }
       }
-    });
-  }
-
-  newUserSubmit = event => {
-    this.setState({ newUserModal: false });
-    const newUser = {
-      title: this.state.title,
-      body: this.state.body,
-      userId: this.state.userId
+      console.log(this.state);
+      formDataProduct.append('image', this.state.selectedFile);
+      for (let name in this.state.formData) {
+        console.log(name, this.state.formData[name])
+        formDataProduct.set(name, this.state.formData[name]);
+      }
+      console.log(`http://${server.ip}:${server.port}/product/addProduct`);
+      axios.post(`http://${server.ip}:${server.port}/product/addProduct`, formDataProduct, config)
+        .then(res => alert("File uploaded successfully."))
+        .catch((err) => console.log(err));
     }
-    axios.post('http://192.168.2.65:3030/posts', newUser)
-      .then(res => console.log(res.data))
-      .then((e) => this.updateListHandler());
   }
-
-  updateListHandler = () => {
-    const { reloadList } = this.state;
-    this.setState({ reloadList: !reloadList });
-  }
-
-
 
   render() {
     const { formError, formData } = this.state
-    return (<>
-      <GridContainer>
-        <GridItem xs={12} sm={12} md={12}>
-          <Card>
-            <CardHeader color="primary">
-              <h4 className>Add Product</h4>
-              <p className>Complete your product details</p>
-              {/* <h4 className={classes.cardTitleWhite}>Add Product</h4>
+    return (
+      <>
+        <GridContainer>
+          <GridItem xs={12} sm={12} md={12}>
+            <Card>
+              <CardHeader color="primary">
+                <h4>Add Product</h4>
+                <p>Complete your product details</p>
+                {/* <h4 className={classes.cardTitleWhite}>Add Product</h4>
 							<p className={classes.cardCategoryWhite}>Complete your product details</p> */}
-            </CardHeader>
-            <CardBody>
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={3}>
-                  <InputBox
-                    label='Product SKU'
-                    type='text'
-                    name='sku'
-                    placeHolder='product unique Id'
-                    value={formData.sku}
-                    isReq={true}
-                    errorMessage={formError.sku}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={3}>
-                  <DropDown
-                    label='Category'
-                    isReq={true}
-                    name='category'
-                    list={this.categoryList}
-                    value={formData.category}
-                    onChange={this.dataHandler}
-                    errorMessage={formError.category}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={6}>
-                  <DropDown
-                    label='MediaType'
-                    isReq={true}
-                    name='mediaType'
-                    list={this.mediaList}
-                    value={formData.mediaType}
-                    onChange={this.dataHandler}
-                    errorMessage={formError.mediaType}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-              </GridContainer>
+              </CardHeader>
+              <CardBody>
+                <br />
+                <GridContainer>
+                  <GridItem xs={12} sm={12} md={3}>
+                    <InputBox
+                      label='Product SKU'
+                      type='text'
+                      name='sku'
+                      placeHolder='product unique Id'
+                      value={formData.sku}
+                      isReq={true}
+                      errorMessage={formError.sku}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={3}>
+                    <DropDown
+                      label='Category'
+                      isReq={true}
+                      name='category'
+                      list={this.categoryList}
+                      value={formData.category}
+                      onChange={this.dataHandler}
+                      errorMessage={formError.category}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={3}>
+                    <DropDown
+                      label='MediaType'
+                      isReq={true}
+                      name='mediaType'
+                      list={this.mediaList}
+                      value={formData.mediaType}
+                      onChange={this.dataHandler}
+                      errorMessage={formError.mediaType}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={3}>
+                    <InputBox
+                      label='Lighting Type'
+                      type='text'
+                      name='lightingType'
+                      placeHolder='ab123456'
+                      value={formData.lightingType}
+                      isReq={true}
+                      errorMessage={formError.lightingType}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                </GridContainer>
 
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={3}>
-                  <InputBox
-                    label='Lighting Type'
-                    type='text'
-                    name='lightingType'
-                    placeHolder='ab123456'
-                    value={formData.lightingType}
-                    isReq={true}
-                    errorMessage={formError.lightingType}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={3}>
-                  <InputBox
-                    label='Size'
-                    type='text'
-                    name='size'
-                    placeHolder='ab123456'
-                    value={formData.size}
-                    isReq={true}
-                    errorMessage={formError.size}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={6}>
-                  <DropDown
-                    label='Unit'
-                    isReq={true}
-                    name='unit'
-                    list={this.unitList}
-                    value={formData.unit}
-                    onChange={this.dataHandler}
-                    errorMessage={formError.unit}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-              </GridContainer>
+                <GridContainer>
+                  <GridItem xs={12} sm={12} md={3}>
+                    <FormGroup className="input-box-style" >
+                      <Label className="label">
+                        Size
+                      {<span style={{ color: "red" }}> * </span>}
+                      </Label><br />
+                      <input
+                        className="input"
+                        placeholder="12"
+                        type="text"
+                        name="sizex"
+                        size="4"
+                        value={formData.sizex}
+                        onChange={this.dataHandler}
+                        onBlur={this.validationHandler}
+                      />
+                      <Label className="label"> X </Label>
+                      <input
+                        className="input"
+                        placeholder="12"
+                        type="text"
+                        name="sizey"
+                        size="4"
+                        value={formData.sizey}
+                        onChange={this.dataHandler}
+                        onBlur={this.validationHandler}
+                      /><br /><br />
+                    </FormGroup>
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={3}>
+                    <DropDown
+                      label='Unit'
+                      isReq={true}
+                      name='unit'
+                      list={this.unitList}
+                      value={formData.unit}
+                      onChange={this.dataHandler}
+                      errorMessage={formError.unit}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={6}>
+                    <FormGroup className="input-box-style" >
+                      <Label className="label">
+                        Image of Product
+                      {<span style={{ color: "red" }}> * </span>}
+                      </Label><br />
+                      <input
+                        type="file"
+                        className="form-control"
+                        name="file"
+                        onChange={this.onFileChangeHandler}
+                      />
+                    </FormGroup>
+                  </GridItem>
+                </GridContainer>
 
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='Latitude'
-                    type='text'
-                    name='lat'
-                    placeHolder='ab123456'
-                    value={formData.lat}
-                    isReq={true}
-                    errorMessage={formError.lat}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
+                <GridContainer>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='Latitude'
+                      type='text'
+                      name='lat'
+                      placeHolder='ab123456'
+                      value={formData.lat}
+                      isReq={true}
+                      errorMessage={formError.lat}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
 
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='Longitude'
-                    type='text'
-                    name='lng'
-                    placeHolder='ab123456'
-                    value={formData.lng}
-                    isReq={true}
-                    errorMessage={formError.lng}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='Location'
-                    type='text'
-                    name='location'
-                    placeHolder='ab123456'
-                    value={formData.location}
-                    isReq={true}
-                    errorMessage={formError.loaction}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-              </GridContainer>
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='Locality'
-                    type='text'
-                    name='locality'
-                    placeHolder='1234567890'
-                    value={formData.locality}
-                    isReq={true}
-                    errorMessage={formError.locality}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='Landmark'
-                    type='text'
-                    name='landmark'
-                    placeHolder='Xyz@123'
-                    value={formData.landmark}
-                    isReq={true}
-                    errorMessage={formError.landmark}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='Longitude'
+                      type='text'
+                      name='lng'
+                      placeHolder='ab123456'
+                      value={formData.lng}
+                      isReq={true}
+                      errorMessage={formError.lng}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='Location'
+                      type='text'
+                      name='location'
+                      placeHolder='ab123456'
+                      value={formData.location}
+                      isReq={true}
+                      errorMessage={formError.loaction}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                </GridContainer>
+                <GridContainer>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='Locality'
+                      type='text'
+                      name='locality'
+                      placeHolder='1234567890'
+                      value={formData.locality}
+                      isReq={true}
+                      errorMessage={formError.locality}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='Landmark'
+                      type='text'
+                      name='landmark'
+                      placeHolder='Xyz@123'
+                      value={formData.landmark}
+                      isReq={true}
+                      errorMessage={formError.landmark}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
 
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='City'
-                    type='text'
-                    name='city'
-                    placeHolder=''
-                    value={formData.city}
-                    isReq={true}
-                    errorMessage={formError.city}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-              </GridContainer>
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='State'
-                    type='text'
-                    name='state'
-                    placeHolder='1234567890'
-                    value={formData.state}
-                    isReq={true}
-                    errorMessage={formError.state}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='Rate per Month'
-                    type='text'
-                    name='ratePerMonth'
-                    placeHolder='Xyz@123'
-                    value={formData.ratePerMonth}
-                    isReq={true}
-                    errorMessage={formError.ratePerMonth}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='City'
+                      type='text'
+                      name='city'
+                      placeHolder=''
+                      value={formData.city}
+                      isReq={true}
+                      errorMessage={formError.city}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                </GridContainer>
+                <GridContainer>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='State'
+                      type='text'
+                      name='state'
+                      placeHolder='1234567890'
+                      value={formData.state}
+                      isReq={true}
+                      errorMessage={formError.state}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='Rate per Month'
+                      type='number'
+                      name='ratePerMonth'
+                      placeHolder='Xyz@123'
+                      value={formData.ratePerMonth}
+                      isReq={true}
+                      errorMessage={formError.ratePerMonth}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
 
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='Rate per Day'
-                    type='text'
-                    name='ratePerDay'
-                    placeHolder=''
-                    value={formData.ratePerDay}
-                    isReq={true}
-                    errorMessage={formError.ratePerDay}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-              </GridContainer>
-              <GridContainer>
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='Tier'
-                    type='text'
-                    name='tier'
-                    placeHolder=''
-                    value={formData.tier}
-                    isReq={true}
-                    errorMessage={formError.tier}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
-                <GridItem xs={12} sm={12} md={4}>
-                  <InputBox
-                    label='Initial Cost'
-                    type='text'
-                    name='initialCost'
-                    placeHolder='Xyz@123'
-                    value={formData.initialCost}
-                    isReq={true}
-                    errorMessage={formError.initialCost}
-                    onChange={this.dataHandler}
-                    onBlur={this.validationHandler}
-                  />
-                </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='Rate per Day'
+                      type='number'
+                      name='ratePerDay'
+                      placeHolder=''
+                      value={formData.ratePerDay}
+                      isReq={true}
+                      errorMessage={formError.ratePerDay}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                </GridContainer>
+                <GridContainer>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='Tier'
+                      type='number'
+                      name='tier'
+                      placeHolder=''
+                      value={formData.tier}
+                      isReq={true}
+                      errorMessage={formError.tier}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
+                  <GridItem xs={12} sm={12} md={4}>
+                    <InputBox
+                      label='Initial Cost'
+                      type='number'
+                      name='initialCost'
+                      placeHolder='Xyz@123'
+                      value={formData.initialCost}
+                      isReq={true}
+                      errorMessage={formError.initialCost}
+                      onChange={this.dataHandler}
+                      onBlur={this.validationHandler}
+                    />
+                  </GridItem>
 
-              </GridContainer>
+                </GridContainer>
 
-            </CardBody>
-            <CardFooter>
-              <Button color="primary" onClick={this.submitHandler}>Add</Button>
-            </CardFooter>
-          </Card>
-        </GridItem>
-      </GridContainer>
-    </>
+              </CardBody>
+              <CardFooter>
+                <Button color="primary" onClick={this.submitHandler}>Add</Button>
+              </CardFooter>
+            </Card>
+          </GridItem>
+        </GridContainer>
+      </>
     );
   }
 }
