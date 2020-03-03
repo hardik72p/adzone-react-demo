@@ -38,17 +38,10 @@ import AddProduct from "views/UserProfile/AddProduct.js";
 // core components/views for RTL layout
 import RTLPage from "views/RTLPage/RTLPage.js";
 import { isParameter } from "typescript";
+import Email from "components/Email";
 
 
 const dashboardRoutes = [
-  // {
-  //   path: "/profile",
-  //   name: "Dashboard",
-  //   rtlName: "لوحة القيادة",
-  //   // icon: Profile,
-  //   component: AddProduct,
-  //   layout: "/publicity"
-  // },
   {
     path: "/dashboard",
     name: "Dashboard",
@@ -73,6 +66,7 @@ const dashboardRoutes = [
     rtlName: "قائمة الجدول",
     icon: "content_paste",
     component: TableList,
+    // component: ViewProduct,
     layout: "/publicity"
   },
   {
@@ -80,7 +74,8 @@ const dashboardRoutes = [
     name: "Report",
     rtlName: "طباعة",
     icon: LibraryBooks,
-    component: Typography,
+    // component: Typography,
+    component: Email,
     layout: "/publicity"
   },
   {

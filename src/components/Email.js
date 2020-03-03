@@ -1,16 +1,49 @@
-import { Component } from "react";
+import React, { Component, createRef } from "react";
 import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import 'scss/my-scss.scss';
+
 
 class Email extends Component {
   constructor(props) {
     super(props);
-
+    this.my = createRef();
   }
+
+  handleKeyDown(e) {
+    e.target.style.height = 'inherit';
+    e.target.style.height = `${e.target.scrollHeight}px`;
+  }
+
+  writeMode = () => {
+    console.log("*******************************************");
+    this.my.current.focus();
+  }
+
+
   render() {
     return (
       <>
         <Form>
           <FormGroup>
+            <Label>File</Label>
+            <Input
+              type="file"
+              name="file"
+              id="exampleFile"
+            />
+          </FormGroup><br />
+          <FormGroup tag="fieldset"  onClick={this.writeMode}>
+            <legend>Description</legend>
+            <Input
+              type="textarea"
+              innerRef={this.my}
+              name="text"
+              className="exampleText"
+              onKeyDown={this.handleKeyDown}
+            />
+          </FormGroup>
+        </Form>
+        {/* <FormGroup>
             <Label for="exampleEmail">Email</Label>
             <Input type="email" name="email" id="exampleEmail" placeholder="with a placeholder" />
           </FormGroup>
@@ -41,23 +74,9 @@ class Email extends Component {
           <FormGroup>
             <Label for="exampleText">Text Area</Label>
             <Input type="textarea" name="text" id="exampleText" />
-          </FormGroup>
-          <FormGroup>
-            <Label for="exampleFile">File</Label>
-            <Input type="file" name="file" id="exampleFile" />
-            <FormText color="muted">
-              This is some placeholder block-level help text for the above input.
-              It's a bit lighter and easily wraps to a new line.
-        </FormText>
-          </FormGroup>
-          <FormGroup tag="fieldset">
-            <legend>Radio Buttons</legend>
-            <FormGroup check>
-              <Label check>
-                <Input type="radio" name="radio1" />{' '}
-                Option one is this and that—be sure to include why it's great
-          </Label>
-            </FormGroup>
+          </FormGroup> 
+
+
             <FormGroup check>
               <Label check>
                 <Input type="radio" name="radio1" />{' '}
@@ -78,7 +97,7 @@ class Email extends Component {
         </Label>
           </FormGroup>
           <Button>Submit</Button>
-        </Form>
+        </Form>*/}
       </>
     );
   }
